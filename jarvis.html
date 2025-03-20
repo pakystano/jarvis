@@ -78,86 +78,71 @@
     <p id="risposta"></p>
 
     <script>
-        async function parla() {
-            let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = "it-IT"; 
-            recognition.start();
+    function processaComando(testo) {
+        document.getElementById("risposta").innerText = "Hai detto: " + testo;
+        let risposta = "Non ho capito.";
 
-            recognition.onresult = function(event) {
-                let testo = event.results[0][0].transcript.toLowerCase();
-                processaComando(testo);
-            };
+        if (testo.includes("ciao")) risposta = "Ciao! Come posso aiutarti?";
+        if (testo.includes("che ore sono")) risposta = "Sono le " + new Date().toLocaleTimeString();
+        if (testo.includes("musica")) {
+            risposta = "Apro YouTube per la musica.";
+            window.open("https://www.youtube.com/results?search_query=musica");
+        }
+        if (testo.includes("meteo")) {
+            risposta = "Apro il meteo.";
+            window.open("https://www.meteo.it/");
+        }
+        if (testo.includes("cerca")) {
+            let query = testo.replace("cerca", "").trim();
+            risposta = "Cerco su Google: " + query;
+            window.open("https://www.google.com/search?q=" + encodeURIComponent(query));
+        }
+        if (testo.includes("accendi luci")) risposta = "Accendo le luci della smart home.";
+        if (testo.includes("spegni luci")) risposta = "Spengo le luci della smart home.";
+        if (testo.includes("notizie")) {
+            risposta = "Apro le ultime notizie.";
+            window.open("https://news.google.com/");
+        }
+        if (testo.includes("apri email")) {
+            risposta = "Apro la tua email.";
+            window.open("https://mail.google.com/");
+        }
+        if (testo.includes("impostazioni")) {
+            risposta = "Apro le impostazioni di sistema.";
+            window.open("settings");
+        }
+        if (testo.includes("metti la canzone")) {
+            let canzone = testo.replace("metti la canzone", "").trim();
+            if (canzone !== "") {
+                risposta = "Metto la canzone: " + canzone;
+                window.open("https://www.youtube.com/results?search_query=" + encodeURIComponent(canzone));
+            } else {
+                risposta = "Per favore, dimmi il nome della canzone che vuoi cercare.";
+            }
+        }
+        if (testo.includes("twitch")) {
+            risposta = "Apro Twitch.";
+            window.open("https://twitch.com/");
+        }
+        if (testo.includes("apri il canale twitch di")) {
+            let canale = testo.replace("apri il canale twitch di", "").trim();
+            if (canale !== "") {
+                risposta = "Apro il canale Twitch di " + canale;
+                window.open("https://www.twitch.tv/" + encodeURIComponent(canale));
+            } else {
+                risposta = "Per favore, dimmi il nome del canale che vuoi cercare.";
+            }
         }
 
-        function inviaComando() {
-            let testo = document.getElementById("comandoTestuale").value;
-            if (testo.trim() !== "") {
-                processaComando(testo);
-            }
+        // SE NON TROVA UNA RISPOSTA, CERCA SU GOOGLE
+        if (risposta === "Non ho capito.") {
+            risposta = "Non conosco la risposta, ma posso cercarla per te.";
+            window.open("https://www.google.com/search?q=" + encodeURIComponent(testo));
         }
 
-        function inviaConInvio(event) {
-            if (event.key === "Enter") {
-                inviaComando();
-            }
-        }
-        
-        async function processaComando(testo) {
-            document.getElementById("risposta").innerText = "Hai detto: " + testo;
-            let risposta = "Non ho capito.";
-
-            if (testo.includes("ciao")) risposta = "Ciao! Come posso aiutarti?";
-            if (testo.includes("che ore sono")) risposta = "Sono le " + new Date().toLocaleTimeString();
-            if (testo.includes("musica")) {
-                risposta = "Apro YouTube per la musica.";
-                window.open("https://www.youtube.com/results?search_query=musica");
-            }
-            if (testo.includes("meteo")) {
-                risposta = "Apro il meteo.";
-                window.open("https://www.meteo.it/");
-            }
-            if (testo.includes("cerca")) {
-                let query = testo.replace("cerca", "").trim();
-                risposta = "Cerco su Google: " + query;
-                window.open("https://www.google.com/search?q=" + encodeURIComponent(query));
-            }
-            if (testo.includes("accendi luci")) risposta = "Accendo le luci della smart home.";
-            if (testo.includes("spegni luci")) risposta = "Spengo le luci della smart home.";
-            if (testo.includes("notizie")) {
-                risposta = "Apro le ultime notizie.";
-                window.open("https://news.google.com/");
-            }
-            if (testo.includes("apri email")) {
-                risposta = "Apro la tua email.";
-                window.open("https://mail.google.com/");
-            }
-            if (testo.includes("impostazioni")) {
-                risposta = "Apro le impostazioni di sistema.";
-                window.open("settings");
-            }
-            if (testo.includes("traduci")) {
-                let parole = testo.replace("traduci", "").trim();
-                risposta = "Sto traducendo...";
-                let traduzione = await traduciTesto(parole, "en");
-                risposta = `Traduzione: ${traduzione}`;
-            }
-            if (testo.includes("calcola")) {
-                let espressione = testo.replace("calcola", "").trim();
-                try {
-                    let risultato = eval(espressione);
-                    risposta = "Il risultato è: " + risultato;
-                } catch {
-                    risposta = "Non riesco a calcolare quello che hai detto.";
-                }
-            }
-            document.getElementById("risposta").innerText = risposta;
-            responsiveVoice.speak(risposta, "Italian Female");
-        }
-
-        async function traduciTesto(parole, linguaDestinazione) {
-            // Esegui la traduzione (utilizza un'API di traduzione o logica personalizzata)
-            return "Traduzione simulata: " + parole;
-        }
-    </script>
+        document.getElementById("risposta").innerText = risposta;
+        responsiveVoice.speak(risposta, "Italian Female");
+    }
+        </script>
 </body>
 </html>
